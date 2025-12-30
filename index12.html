@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheatreFest 26 | Crescent Team Dramatics</title>
+
+<style>
+:root{
+  --gold:#d4af37;
+  --teal:#6fe7dd;
+  --amber:#f7b733;
+  --aqua:#e5bb01;
+  --rose:#e6b8b8;
+}
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Segoe UI,sans-serif}
+
+/* BACKGROUND */
+body{
+  background:
+    radial-gradient(circle at top, rgba(120,0,0,.35), transparent 55%),
+    linear-gradient(180deg, #000, #120000, #000);
+  color:#fff;
+  overflow-x:hidden;
+}
+
+/* PARTICLES */
+canvas{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+}
+
+/* NAV */
+nav{
+  position:fixed;
+  top:0;
+  width:100%;
+  padding:18px;
+  background:rgba(0,0,0,.85);
+  backdrop-filter:blur(10px);
+  text-align:center;
+  z-index:1000;
+}
+nav h1{color:var(--gold)}
+nav a{
+  margin:0 14px;
+  color:#ddd;
+  text-decoration:none;
+  font-size:14px;
+}
+nav a:hover{color:var(--gold)}
+
+/* SECTIONS */
+section{
+  min-height:100vh;
+  padding:150px 8vw 120px;
+}
+
+/* TITLES */
+.section-title{
+  font-size:38px;
+  margin-bottom:20px;
+}
+.section-desc{
+  margin-bottom:35px;
+  line-height:1.8;
+}
+
+/* REVEAL */
+.reveal{
+  opacity:0;
+  transform:translateY(60px);
+  transition:1s ease;
+}
+.reveal.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* FLOAT */
+.float{
+  animation:float 6s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-18px)}
+}
+
+/* SPLIT */
+.split{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:50px;
+  align-items:center;
+}
+
+/* IMAGE PLACEHOLDER */
+.img-box{
+  width:100%;
+  max-width:750px;        /* makes image area wider */
+  height:420px;           /* increases height */
+  border:2px dashed rgba(255,255,255,.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#aaa;
+  text-align:center;
+  margin-top:20px;
+}
+
+.img-real{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:10px;
+}
+.ctd-gallery img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+  border-radius:8px;
+}
+
+@media(max-width:768px){
+  .img-real{
+    width:95%;
+    max-width:95%;
+  }
+}
+
+/* HOME */
+#home{text-align:center}
+#home h2{
+  color:var(--gold);
+  font-size:clamp(40px,7vw,80px)
+}
+
+/* EVENTS */
+.events{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:30px;
+}
+.event{
+  position:relative;
+  overflow:hidden;
+  border:1px solid var(--gold);
+  cursor:pointer;
+  transition:.5s ease;
+}
+.event img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+  transition:.6s ease;
+}
+.event-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:flex-end;
+  padding:20px;
+  font-size:22px;
+  font-weight:600;
+  background:linear-gradient(transparent, rgba(0,0,0,.9));
+  color:var(--gold);
+}
+.event:hover{
+  transform:translateY(-12px) scale(1.04);
+  box-shadow:0 0 35px rgba(212,175,55,.45);
+}
+.event:hover img{transform:scale(1.15)}
+
+/* RULES */
+.rules-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:30px;
+}
+.rule-box{
+  background:rgba(0,0,0,.75);
+  border:1px solid rgba(247,183,51,.6);
+  padding:25px;
+  transition:.4s ease;
+}
+.rule-box:hover{
+  transform:translateY(-6px);
+  box-shadow:0 0 25px rgba(247,183,51,.35);
+}
+.rule-box h3{
+  color:var(--amber);
+  margin-bottom:15px;
+}
+
+/* CTD */
+.ctd-timeline{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:30px;
+}
+.ctd-block{
+  background:rgba(0,0,0,.75);
+  border-left:4px solid var(--gold);
+  padding:25px;
+  transition:.4s ease;
+}
+.ctd-block:hover{
+  transform:translateY(-6px);
+  box-shadow:0 0 25px rgba(212,175,55,.3);
+}
+.ctd-gallery{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:25px;
+  margin-top:30px;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:25px;
+}
+th{
+  background:var(--aqua);
+  color:#000;
+  padding:14px;
+}
+td{
+  padding:14px;
+  border:1px solid var(--aqua);
+}
+
+/* PEOPLE */
+.people{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:30px;
+}
+.person{
+  border:1px solid rgba(255,255,255,.25);
+  padding:20px;
+  text-align:center;
+  border-radius:14px;
+  background:rgba(0,0,0,.6);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+
+
+/* FOOTER */
+footer{
+  padding:40px;
+  text-align:center;
+  background:#000;
+}
+
+@media(max-width:900px){
+  .split{grid-template-columns:1fr}
+}
+
+.home-poster-wrap{
+  display:flex;
+  justify-content:center;
+  margin-top:24px;
+}
+
+.home-poster{
+  width:88%;
+  max-width:1000px;
+  height:460px;          /* ⬅ reduced height */
+  border-radius:22px;
+  overflow:hidden;
+  background:#000;
+}
+
+.home-poster img{
+  width:100%;
+  height:100%;
+  object-fit:cover;     /* 🔥 fills full width */
+  object-position:center;
+}
+@media (max-width:600px){
+  .home-poster{
+    height:260px;
+  }
+}
+
+
+/* COLLEGE IMAGE FIX */
+#college .img-real{
+  width:100%;
+  max-width:900px;     /* ⬅ increases width */
+  height:auto;
+  border:none;         /* ⬅ removes dotted line */
+  border-radius:14px;
+  margin-top:30px;
+}
+/* THEATREFEST SECTION – COMPACT & LEFT ALIGNED */
+#fest{
+  min-height:auto;
+  padding-top:110px;
+  padding-bottom:110px;
+}
+
+/* Wrapper aligned to left */
+.fest-poster-wrap{
+  display:flex;
+  justify-content:flex-start;   /* ⬅ LEFT */
+  margin-top:25px;
+}
+
+/* Smaller, elegant poster */
+.fest-poster{
+  width:100%;
+  max-width:520px;              /* 🔥 reduced size */
+  height:auto;
+  border-radius:14px;
+  box-shadow:0 18px 40px rgba(0,0,0,.55);
+}
+section{
+  scroll-margin-top:120px; /* prevents nav overlap */
+}
+/* ABOUT US IMAGES */
+.about-img{
+  width:100%;
+  max-width:180px;      /* smaller & clean */
+  height:220px;
+  object-fit:cover;
+  border-radius:12px;
+  margin:0 auto 12px;
+  display:block;
+}
+nav h1{
+  white-space:nowrap;
+}
+
+/* MOBILE FIX */
+@media(max-width:600px){
+  nav h1{
+    font-size:20px;      /* smaller so it fits */
+    line-height:1.2;
+  }
+}
+@media(max-width:600px){
+  .home-poster-wrap{
+    margin-top:15px;
+  }
+}
+@media (max-width: 600px) {
+
+  .home-poster{
+    width:100%;
+    height:220px;          /* 🔥 perfect mobile height */
+  }
+
+  .home-poster img{
+    width:100%;
+    height:100%;
+    object-fit:cover;      /* no empty space */
+  }
+
+}
+
+@media(max-width:600px){
+  section{
+    padding:90px 5vw 40px;   /* 🔥 much cleaner */
+  }
+}
+
+@media (max-width: 600px) {
+
+  /* REMOVE full screen height */
+  #home {
+    min-height: auto !important;
+    padding-top: 100px !important;
+    padding-bottom: 20px !important;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  #home img {
+    display: block;
+    
+    width: 100%;
+   
+    margin: 0 auto;
+  }
+
+}
+@media (max-width: 600px) {
+  section::after {
+    content: none !important;
+  }
+}
+/* FIX HOME HEIGHT COMPLETELY */
+#home{
+  min-height:auto !important;
+}
+/* MOBILE – FULL BLEED HOME POSTER (NO SIDE GAPS) */
+@media (max-width: 600px) {
+
+  .home-poster-wrap{
+    margin-left: -6vw;   /* cancel section padding */
+    margin-right: -6vw;
+  }
+
+  .home-poster{
+    width: 100vw;        /* full screen width */
+    max-width: 100vw;
+    height: 260px;       /* controlled height */
+    border-radius: 0;    /* remove curved edges */
+  }
+
+  .home-poster img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* fills width */
+  }
+}
+/* 🔥 MOBILE HOME POSTER – ZERO BLACK SPACE FIX */
+@media (max-width: 600px) {
+
+  /* remove section padding influence */
+  #home {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .home-poster-wrap {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .home-poster {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: auto !important;      /* ❗ CRITICAL */
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  .home-poster img {
+    width: 100vw !important;
+    height: auto !important;      /* ❗ CRITICAL */
+    display: block;
+    object-fit: unset !important; /* ❗ STOP LETTERBOXING */
+  }
+}
+/* 📱 MOBILE – COLLEGE IMAGE HEIGHT INCREASE */
+@media (max-width: 600px) {
+
+  #college .img-real {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 260px !important;   /* ⬅ increase height */
+    object-fit: cover;          /* fills height nicely */
+    border-radius: 16px;
+  }
+
+}
+/* 📱 MOBILE – HOME POSTER HEIGHT BOOST */
+@media (max-width: 600px){
+
+  .home-poster{
+    width:100%;
+    max-width:100%;
+    height:320px;        /* ⬅ increased height */
+    border-radius:18px;
+  }
+
+  .home-poster img{
+    width:100%;
+    height:100%;
+    object-fit:cover;   /* fills height nicely */
+  }
+
+}
+/* =========================
+   HOME POSTER – MOBILE FIX
+   ========================= */
+@media (max-width: 600px){
+
+  #home{
+    min-height:auto;
+    padding-bottom:30px;
+  }
+
+  .home-poster-wrap{
+    margin-top:16px;
+  }
+
+  .home-poster{
+    width:100%;
+    max-width:100%;
+    height:340px;          /* ✅ HEIGHT INCREASED */
+    border-radius:22px;    /* ✅ ROUNDED CORNERS */
+    overflow:hidden;
+    background:#000;
+  }
+
+  .home-poster img{
+    width:100%;
+    height:100%;
+    object-fit:cover;      /* fills height properly */
+    border-radius:22px;
+  }
+
+}
+/* THEATREFEST – SPLIT LAYOUT LIKE COLLEGE */
+#fest{
+  min-height:auto;
+  padding-top:120px;
+  padding-bottom:120px;
+}
+
+/* Right-side poster */
+.fest-poster-img{
+  width:100%;
+  max-width:520px;
+  height:auto;
+  border-radius:16px;
+  box-shadow:0 18px 40px rgba(0,0,0,.55);
+}
+
+/* Mobile stack fix */
+@media(max-width:900px){
+  #fest .split{
+    grid-template-columns:1fr;
+  }
+
+  .fest-poster-img{
+    margin-top:30px;
+  }
+}
+
+
+
+
+
+</style>
+</head>
+
+<body>
+
+<canvas id="particles"></canvas>
+
+<nav>
+  <h1>Crescent Team Dramatics</h1>
+  <div>
+    <a href="#home">Home</a>
+    <a href="#college">University</a>
+    <a href="#ctd">CTD</a>
+    <a href="#fest">TheatreFest</a>
+    <a href="#schedule">Schedule</a>
+    <a href="#events">Events</a>
+    <a href="#rules">Rules</a>
+    <a href="#about">About</a>
+  </div>
+</nav>
+
+<!-- HOME -->
+<section id="home" class="reveal">
+  <h2>THEATREFEST ’26</h2>
+  <p class="section-desc">South India's Biggest Inter-College Dramatics Festival<br>📅 january 24 & 25, 2026</p>
+  <div class="home-poster-wrap">
+  <div class="home-poster">
+    <img src="images/fest26.png" alt="TheatreFest 26 Poster">
+  </div>
+</div>
+
+
+
+</section>
+
+<!-- COLLEGE -->
+<section id="college" class="reveal">
+  <div class="split">
+    <div>
+      <h2 class="section-title" style="color:var(--teal)">Crescent University</h2>
+      <p class="section-desc">
+        B.S. Abdur Rahman Crescent Institute of Science & Technology,
+        established in 1984, is a NAAC A+ accredited university,NBA Accredited 
+        NIRF Ranked in Engineering, Management, Architecture & Overall Category.
+      </p>
+      <p>Programs Campus Strength:<br>
+         12,000+ Students <br>
+         500+ Faculty <br>
+         20+ Research Centres
+      </p>
+    </div>
+
+    <div>
+      <img src="images/college.jpg" class="img-real" alt="college image">
+    </div>
+  </div>
+</section>
+
+
+
+<!-- CTD -->
+<section id="ctd" class="reveal">
+  <h2 class="section-title" style="color:var(--gold)">Crescent Team Dramatics</h2>
+  <p class="section-desc">
+    Crescent Team Dramatics (CTD) is one of South India’s most consistent and
+    evolving dramatics teams, known for innovation and excellence.
+  </p>
+
+  <div class="ctd-timeline">
+    <div class="ctd-block"><h3>1984</h3><p>Founded as Crescent Drama Team</p></div>
+    <div class="ctd-block"><h3>2006</h3><p>Official Crescent Variety Team</p></div>
+    <div class="ctd-block"><h3>2009</h3><p>Renamed as Crescent Team Dramatics</p></div>
+    <div class="ctd-block"><h3>2010–Present</h3><p>Technical acts & consistent wins</p></div>
+  </div>
+
+  <h3 style="margin-top:40px;color:var(--amber)">CTD Through the Years</h3>
+  <div class="ctd-gallery">
+    <img src="images/performance.jpeg" class="img-real" alt="performance">
+    <img src="images/backstage.jpg" class="img-real" alt="backstage">
+    <img src="images/awards.jpg" class="img-real" alt="awards">
+    <img src="images/technicalact.jpeg" class="img-real" alt="technical act">
+  </div>
+</section>
+
+<!-- FEST -->
+<section id="fest" class="reveal">
+  <div class="split">
+
+    <!-- LEFT CONTENT -->
+    <div>
+      <h2 class="section-title" style="color:var(--amber)">About TheatreFest</h2>
+      <p class="section-desc">
+        South India’s biggest inter-college dramatics festival.
+        TheatreFest brings together the finest theatre talents
+        from across the region to celebrate creativity, storytelling,
+        and performance excellence.
+      </p>
+    </div>
+
+    <!-- RIGHT IMAGE -->
+    <div>
+      <img src="images/fest.jpg" class="fest-poster-img" alt="TheatreFest Poster">
+    </div>
+
+  </div>
+</section>
+
+
+
+<!-- SCHEDULE -->
+<section id="schedule" class="reveal">
+  <h2 class="section-title" style="color:var(--aqua)">Event Schedule</h2>
+  <h3>Day 1</h3>
+  <table>
+    <tr><th>Event</th><th>Time</th><th>Venue</th></tr>
+    <tr><td>Opening Ceremony</td><td>9:00–10:30</td><td>Main Stage</td></tr>
+  </table>
+  <h3 style="margin-top:30px">Day 2</h3>
+  <table>
+    <tr><th>Event</th><th>Time</th><th>Venue</th></tr>
+    <tr><td>Adzap</td><td>1:30–2:30</td><td>Main Stage</td></tr>
+  </table>
+</section>
+
+<!-- EVENTS -->
+<section id="events" class="reveal">
+  <h2 class="section-title" style="color:var(--gold)">Events</h2>
+
+  <div class="events">
+
+    <div class="event" onclick="window.open('FORM_ADZAP_LINK','_blank')">
+      <img src="images/events/adzap.jpeg">
+      <div class="event-overlay">Adzap</div>
+    </div>
+
+    <div class="event" onclick="window.open('FORM_MIME_LINK','_blank')">
+      <img src="images/events/mime.jpg">
+      <div class="event-overlay">Mime</div>
+    </div>
+
+    <div class="event" onclick="window.open('FORM_SOLO_LINK','_blank')">
+      <img src="images/events/solo.jpeg">
+      <div class="event-overlay">Solo Act</div>
+    </div>
+
+    <div class="event" onclick="window.open('FORM_VARIETY_LINK','_blank')">
+      <img src="images/events/variety.jpeg">
+      <div class="event-overlay">Variety</div>
+    </div>
+
+    <div class="event" onclick="window.open('FORM_CHANNEL_LINK','_blank')">
+      <img src="images/events/channelsurfing.jpeg">
+      <div class="event-overlay">Channel Surfing</div>
+    </div>
+
+    <div class="event" onclick="window.open('FORM_MONO_LINK','_blank')">
+      <img src="images/events/mono.jpeg">
+      <div class="event-overlay">Mono Act</div>
+    </div>
+
+    <div class="event" onclick="window.open('FORM_TALENT_LINK','_blank')">
+      <img src="images/events/talent.jpeg">
+      <div class="event-overlay">Talent Show</div>
+    </div>
+
+    <div class="event" onclick="window.open('FORM_THEATRE_LINK','_blank')">
+      <img src="images/events/theatreplay.jpeg">
+      <div class="event-overlay">Theatre Play</div>
+    </div>
+
+  </div>
+</section>
+
+
+
+<!-- RULES -->
+<section id="rules" class="reveal">
+  <h2 class="section-title" style="color:var(--amber)">Event Rules</h2>
+
+  <div class="rules-container">
+
+    <div class="rule-box">
+      <h3>Adzap</h3>
+      <p>• Team size: 2–4 members</p>
+      <p>• Time: 3 + 1 minutes</p>
+      <p>• Product given on the spot</p>
+      <p>• Vulgarity not allowed</p>
+    </div>
+
+    <div class="rule-box">
+      <h3>Mime</h3>
+      <p>• Team size: 4–8 members</p>
+      <p>• Time: 5–7 minutes</p>
+      <p>• No dialogue or lip-sync</p>
+      <p>• Background music allowed</p>
+    </div>
+
+    <div class="rule-box">
+      <h3>Solo Act</h3>
+      <p>• Individual participation</p>
+      <p>• Time limit: 4 minutes</p>
+      <p>• Acting / expression based</p>
+      <p>• Offensive content not allowed</p>
+    </div>
+
+    <div class="rule-box">
+      <h3>Variety</h3>
+      <p>• Team size: 2–8 members</p>
+      <p>• Time: 6–8 minutes</p>
+      <p>• Dance, skit, music allowed</p>
+      <p>• Props must be safe</p>
+    </div>
+
+    <div class="rule-box">
+      <h3>Channel Surfing</h3>
+      <p>• Team size: 4–6 members</p>
+      <p>• Time: 6–8 minutes</p>
+      <p>• Clear channel transitions</p>
+      <p>• Original content preferred</p>
+    </div>
+
+    <div class="rule-box">
+      <h3>Mono Act</h3>
+      <p>• Individual participation</p>
+      <p>• Time: 4–5 minutes</p>
+      <p>• Character-based performance</p>
+      <p>• Music allowed</p>
+    </div>
+
+    <div class="rule-box">
+      <h3>Talent Show</h3>
+      <p>• Individual / Team (max 6)</p>
+      <p>• Time: 3–5 minutes</p>
+      <p>• Any talent allowed</p>
+      <p>• Props handled by participants</p>
+    </div>
+
+    <div class="rule-box">
+      <h3>Theatre Play</h3>
+      <p>• Team size: 8–15 members</p>
+      <p>• Time: 20–25 minutes</p>
+      <p>• Script-based performance</p>
+      <p>• Props & costumes allowed</p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ABOUT -->
+<section id="about" class="reveal">
+  <h2 class="section-title" style="color:var(--rose)">About Us</h2>
+
+  <div class="people">
+
+    <div class="person">
+      <img src="images/staff.jpeg" class="about-img" alt="Staff Coordinator">
+      <h4>Staff Coordinator</h4>
+    </div>
+
+    <div class="person">
+      <img src="images/head1.jpeg" class="about-img" alt="Club Head 1">
+      <h4>Club Head</h4>
+      <p>📞 9XXXXXXXXX</p>
+      <p>✉️ head1@gmail.com</p>
+    </div>
+
+    <div class="person">
+      <img src="images/head2.jpeg" class="about-img" alt="Club Head 2">
+      <h4>Club Head</h4>
+      <p>📞 9XXXXXXXXX</p>
+      <p>✉️ head2@gmail.com</p>
+    </div>
+
+  </div>
+</section>
+
+
+
+<footer>© Crescent Team Dramatics – TheatreFest ’26</footer>
+
+<script>
+/* PARTICLES */
+const c=document.getElementById("particles"),x=c.getContext("2d");
+let w,h;function r(){w=c.width=innerWidth;h=c.height=innerHeight}
+addEventListener("resize",r);r();
+let p=[...Array(80)].map(()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*2+1,s:Math.random()*.3+.1}));
+(function a(){
+  x.clearRect(0,0,w,h);
+  p.forEach(o=>{
+    x.beginPath();
+    x.arc(o.x,o.y,o.r,0,Math.PI*2);
+    x.fillStyle="rgba(212,175,55,.35)";
+    x.fill();
+    o.y-=o.s;if(o.y<0)o.y=h;
+  });
+  requestAnimationFrame(a);
+})();
+
+/* REVEAL */
+const obs=new IntersectionObserver(e=>{
+  e.forEach(v=>v.isIntersecting&&v.target.classList.add("show"))
+},{threshold:.2});
+document.querySelectorAll(".reveal").forEach(el=>obs.observe(el));
+</script>
+
+</body>
+</html>
